@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sinamatics | Toronto Recording Studio, Music Videos & Artist Development</title>
+<meta name="description" content="Sinamatics is a Toronto-based music production and creative studio offering recording, mixing, mastering, music videos, content creation, marketing, and artist development services. Record, film, and promote your next project under one roof."/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--gold:#FFD700;--red:#FF2D2D;}
+html,body{background:#000;color:#fff;font-family:'Space Grotesk',sans-serif;overflow:hidden;height:100vh;width:100vw;}
+#waveform{position:fixed;inset:0;z-index:0;}
+#vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse at center,rgba(0,0,0,0.62) 0%,rgba(0,0,0,0.93) 100%),
+  linear-gradient(to bottom,rgba(0,0,0,0.78) 0%,rgba(0,0,0,0.28) 30%,rgba(0,0,0,0.28) 70%,rgba(0,0,0,0.82) 100%);}
+#overlay{position:fixed;inset:0;z-index:190;background:#000;opacity:0;pointer-events:none;transition:opacity 0.22s;}
+#overlay.flash{opacity:0.5;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:20px 48px;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-mark{width:38px;height:38px;border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);}
+.logo-word{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.14em;color:#fff;}
+.logo-word span{color:var(--gold);}
+.logo-sub{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:0.26em;color:rgba(255,215,0,0.45);display:block;margin-top:-1px;text-transform:uppercase;}
+.nav-links{display:flex;gap:26px;list-style:none;}
+.nav-links a{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.36);text-decoration:none;transition:color 0.2s;}
+.nav-links a:hover{color:var(--gold);}
+.nav-cta{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#000;background:var(--gold);border:none;padding:10px 22px;cursor:pointer;transition:opacity 0.2s;}
+.nav-cta:hover{opacity:0.82;}
+
+/* SCENE */
+#scene{position:fixed;inset:0;z-index:10;perspective:900px;pointer-events:none;}
+.panel{position:absolute;left:50%;top:50%;width:min(960px,90vw);transform:translate(-50%,-50%);opacity:0;pointer-events:none;}
+.panel.active{opacity:1;pointer-events:auto;}
+
+/* DOTS */
+#dots{position:fixed;right:24px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:200;}
+.dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.18);transition:all 0.3s;cursor:pointer;}
+.dot.active{background:var(--gold);transform:scaleX(1.5);height:14px;border-radius:2px;}
+#section-label{position:fixed;left:48px;bottom:28px;z-index:150;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.26em;text-transform:uppercase;color:rgba(255,255,255,0.2);}
+#section-label span{color:var(--gold);}
+#scroll-hint{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.18);text-align:center;z-index:150;transition:opacity 0.5s;}
+.tick{display:block;width:1px;height:28px;background:var(--gold);opacity:0.32;margin:7px auto 0;animation:tickA 1.4s infinite;}
+@keyframes tickA{0%,100%{opacity:0.32;transform:scaleY(1);}50%{opacity:0.75;transform:scaleY(0.5);}}
+
+/* SHARED */
+.ey{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.ey::before{content:'';display:block;width:22px;height:1px;background:var(--gold);}
+.big{font-family:'Bebas Neue',sans-serif;font-size:clamp(46px,7.5vw,94px);line-height:0.9;letter-spacing:0.025em;}
+.big .g{color:var(--gold);}.big .r{color:var(--red);}
+.body{font-size:13px;color:rgba(255,255,255,0.48);line-height:1.82;}
+.red-bar{border-left:2px solid var(--red);padding-left:15px;}
+.gold-rule{width:36px;height:1px;background:var(--gold);opacity:0.5;margin:18px 0;}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;}
+.split-right{border-left:0.5px solid rgba(255,215,0,0.14);padding-left:44px;}
+.live{display:inline-flex;align-items:center;gap:7px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--red);margin-bottom:16px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--red);animation:lp 1.1s infinite;}
+@keyframes lp{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.35;transform:scale(0.65);}}
+.btn-primary{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;background:var(--gold);color:#000;border:none;padding:13px 28px;cursor:pointer;transition:opacity 0.2s;}
+.btn-primary:hover{opacity:0.82;}
+.btn-outline{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;background:transparent;color:#fff;border:0.5px solid rgba(255,255,255,0.3);padding:13px 28px;cursor:pointer;transition:color 0.2s,border-color 0.2s;}
+.btn-outline:hover{color:var(--gold);border-color:var(--gold);}
+
+/* HERO */
+.hero-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,10vw,118px);line-height:0.88;letter-spacing:0.02em;}
+.hero-h1 .g{color:var(--gold);}
+.hero-sub{font-size:14px;color:rgba(255,255,255,0.48);line-height:1.8;margin-top:18px;max-width:460px;}
+.hero-sub strong{color:#fff;display:block;margin-top:8px;}
+.hero-btns{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
+.stags{display:flex;flex-wrap:wrap;gap:0;margin-top:26px;}
+.stag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;border:0.5px solid rgba(255,255,255,0.13);padding:7px 13px;color:rgba(255,255,255,0.32);transition:color 0.2s,border-color 0.2s;cursor:default;}
+.stag:hover{color:var(--gold);border-color:rgba(255,215,0,0.45);}
+
+/* ═══ PORTFOLIO GRID ═══ */
+.port-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;}
+.port-tabs{display:flex;gap:0;}
+.ptab{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;padding:7px 14px;border:0.5px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.28);cursor:pointer;transition:all 0.2s;background:transparent;}
+.ptab.active{background:var(--gold);color:#000;border-color:var(--gold);}
+.ptab:hover:not(.active){color:var(--gold);border-color:rgba(255,215,0,0.4);}
+
+.port-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,0.07);}
+.port-card{background:#000;position:relative;overflow:hidden;cursor:pointer;height:160px;display:flex;flex-direction:column;justify-content:flex-end;}
+.port-card-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:transform 0.4s ease;}
+.port-card:hover .port-card-bg{transform:scale(1.05);}
+/* Cinematic colored backgrounds per category */
+.bg-artist{background:linear-gradient(135deg,#0a0010 0%,#1a0030 50%,#0d0020 100%);}
+.bg-music{background:linear-gradient(135deg,#0a0800 0%,#1a1200 50%,#0d0a00 100%);}
+.bg-video{background:linear-gradient(135deg,#0a0000 0%,#1a0500 50%,#0d0000 100%);}
+.bg-commercial{background:linear-gradient(135deg,#000a0a 0%,#001515 50%,#000d0d 100%);}
+.bg-studio{background:linear-gradient(135deg,#050010 0%,#0a001a 50%,#050012 100%);}
+
+/* Waveform art inside cards */
+.card-art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.card-art canvas{position:absolute;inset:0;width:100%;height:100%;opacity:0.55;}
+
+/* Stream count badge */
+.stream-badge{position:absolute;top:10px;left:10px;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;background:rgba(255,215,0,0.12);border:0.5px solid rgba(255,215,0,0.3);color:var(--gold);padding:3px 8px;}
+.video-badge{position:absolute;top:10px;right:10px;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.08em;text-transform:uppercase;background:rgba(255,45,45,0.15);border:0.5px solid rgba(255,45,45,0.35);color:var(--red);padding:3px 8px;}
+/* Play button overlay */
+.play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:36px;height:36px;border:1.5px solid rgba(255,255,255,0.5);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.25s;background:rgba(0,0,0,0.4);}
+.play-btn::after{content:'';width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:11px solid #fff;margin-left:2px;}
+.port-card:hover .play-btn{opacity:1;}
+
+.port-info{position:relative;z-index:2;padding:12px 14px;background:linear-gradient(to top,rgba(0,0,0,0.92) 0%,rgba(0,0,0,0) 100%);padding-top:28px;}
+.port-type{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+.port-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.06em;color:#fff;line-height:1;}
+.port-artist{font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px;}
+
+/* Featured large card */
+.port-card.large{grid-column:span 2;height:160px;}
+
+/* Portfolio stats row */
+.port-stats{display:flex;gap:1px;background:rgba(255,255,255,0.07);margin-top:1px;}
+.pstat{background:#000;flex:1;padding:12px 16px;display:flex;align-items:center;gap:12px;}
+.pstat-num{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--gold);line-height:1;}
+.pstat-lbl{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.28);}
+
+/* SERVICES */
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,0.07);margin-top:26px;}
+.svc{background:#000;padding:22px 18px;border-bottom:2px solid transparent;transition:border-color 0.25s,background 0.25s;}
+.svc:hover{border-bottom-color:var(--gold);background:rgba(255,215,0,0.03);}
+.svc-n{font-family:'Space Mono',monospace;font-size:9px;color:var(--red);letter-spacing:0.1em;margin-bottom:9px;}
+.svc-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.06em;margin-bottom:5px;}
+.svc-desc{font-size:11px;color:rgba(255,255,255,0.35);line-height:1.6;}
+
+/* PRICING */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:26px;}
+.plan{background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.1);padding:22px 18px;position:relative;transition:border-color 0.25s;}
+.plan:hover{border-color:rgba(255,215,0,0.35);}
+.plan.featured{border-color:var(--gold);}
+.plan-badge{position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;background:var(--gold);color:#000;padding:3px 12px;white-space:nowrap;}
+.plan-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.08em;margin-bottom:3px;margin-top:10px;}
+.plan-price{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--gold);line-height:1;}
+.plan-per{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.28);margin-bottom:12px;}
+.plan-feat{list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:12px;}
+.plan-feat li{font-size:11px;color:rgba(255,255,255,0.4);line-height:1.5;padding-left:14px;position:relative;}
+.plan-feat li::before{content:'—';position:absolute;left:0;color:var(--gold);font-size:10px;}
+.plan-feat li strong{color:#fff;}
+.plan-cta{display:block;width:100%;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;background:transparent;border:0.5px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.45);padding:10px;margin-top:16px;cursor:pointer;transition:all 0.2s;text-align:center;}
+.plan-cta:hover{background:var(--gold);color:#000;border-color:var(--gold);}
+.plan.featured .plan-cta{background:var(--gold);color:#000;border-color:var(--gold);}
+
+/* WHY + VALUE */
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:24px;align-items:start;}
+.check-list{display:flex;flex-direction:column;gap:9px;}
+.check-item{display:flex;align-items:center;gap:12px;font-size:13px;color:rgba(255,255,255,0.52);}
+.check-item::before{content:'✓';color:var(--gold);font-family:'Space Mono',monospace;font-size:11px;flex-shrink:0;}
+.check-item strong{color:#fff;}
+.why-right{padding-left:32px;border-left:0.5px solid rgba(255,215,0,0.14);}
+.value-compare{display:flex;flex-direction:column;gap:0;border:0.5px solid rgba(255,255,255,0.1);}
+.vc-title{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.28);padding:10px 14px;border-bottom:0.5px solid rgba(255,255,255,0.07);}
+.vc-row{display:flex;justify-content:space-between;align-items:center;padding:6px 14px;border-bottom:0.5px solid rgba(255,255,255,0.05);font-size:11px;color:rgba(255,255,255,0.38);}
+.vc-row:last-child{border-bottom:none;}
+.vc-red{font-family:'Space Mono',monospace;font-size:10px;color:var(--red);}
+.vc-total-row{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.03);}
+.vc-total-lbl{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.28);}
+
+/* TESTIMONIALS */
+.testi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:26px;}
+.testi-card{background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.08);padding:22px 20px;transition:border-color 0.2s;}
+.testi-card:hover{border-color:rgba(255,215,0,0.25);}
+.stars{color:var(--gold);font-size:13px;letter-spacing:2px;margin-bottom:12px;}
+.testi-quote{font-size:13px;color:rgba(255,255,255,0.68);line-height:1.7;font-style:italic;margin-bottom:14px;}
+.testi-author{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.28);}
+
+/* TEAM */
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px;}
+.team-card{background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.08);padding:20px 18px;transition:border-color 0.2s;}
+.team-card:hover{border-color:rgba(255,215,0,0.3);}
+.team-init{width:44px;height:44px;border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);margin-bottom:14px;}
+.team-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.06em;margin-bottom:4px;}
+.team-role{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.team-bio{font-size:11px;color:rgba(255,255,255,0.36);line-height:1.65;}
+
+/* ABOUT */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,0.05);margin-top:24px;}
+.sbox{background:#000;padding:18px 16px;}
+.snum{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--gold);line-height:1;}
+.slbl{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.26);margin-top:3px;}
+
+/* CTA */
+#p8{text-align:center;}
+.cta-big{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,5.5vw,72px);line-height:0.92;letter-spacing:0.02em;margin-bottom:18px;}
+
+/* BOOK */
+.book-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;}
+.bform{display:flex;flex-direction:column;gap:12px;margin-top:4px;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fg{display:flex;flex-direction:column;gap:5px;}
+.fg label{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.26);}
+.fg input,.fg select,.fg textarea{background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.12);color:#fff;font-family:'Space Grotesk',sans-serif;font-size:12px;padding:10px 12px;outline:none;transition:border-color 0.2s;-webkit-appearance:none;border-radius:0;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--gold);}
+.fg select option{background:#111;color:#fff;}
+.fg textarea{resize:vertical;min-height:72px;}
+.btn-g{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;background:var(--gold);color:#000;border:none;padding:13px 26px;cursor:pointer;transition:opacity 0.2s;align-self:flex-start;margin-top:4px;}
+.btn-g:hover{opacity:0.82;}
+#form-ok{font-family:'Space Mono',monospace;font-size:10px;color:var(--gold);margin-top:6px;display:none;letter-spacing:0.1em;}
+.book-note{font-size:11px;color:rgba(255,255,255,0.3);line-height:1.75;border-left:2px solid rgba(255,215,0,0.28);padding-left:13px;margin-top:18px;}
+
+/* CONTACT */
+#p10{text-align:center;}
+.c-big{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,5.5vw,72px);line-height:0.94;letter-spacing:0.03em;margin:18px 0 26px;}
+.c-big a{color:var(--gold);text-decoration:none;}
+.c-big a:hover{text-decoration:underline;}
+.c-socials{display:flex;gap:0;justify-content:center;}
+.csoc{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.28);text-decoration:none;padding:9px 17px;border:0.5px solid rgba(255,255,255,0.08);transition:color 0.2s,border-color 0.2s;}
+.csoc:hover{color:var(--gold);border-color:var(--gold);}
+.c-info{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.16);margin-top:22px;line-height:2.2;}
+.c-cr{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.12em;color:rgba(255,255,255,0.09);margin-top:14px;text-transform:uppercase;}
+
+@media(max-width:768px){
+  nav{padding:16px 20px;}.nav-links{display:none;}
+  .two,.book-grid,.svc-grid,.pricing-grid,.team-grid,.testi-grid,.why-grid,.port-grid{grid-template-columns:1fr;}
+  .split-right,.why-right{border-left:none;padding-left:0;border-top:0.5px solid rgba(255,215,0,0.1);padding-top:24px;}
+  .port-card.large{grid-column:span 1;}
+  .frow{grid-template-columns:1fr;}
+  .port-tabs{flex-wrap:wrap;}
+}
+</style>
+</head>
+<body>
+<canvas id="waveform"></canvas>
+<div id="vignette"></div>
+<div id="overlay"></div>
+
+<nav>
+  <a class="logo" href="#" onclick="goTo(0);return false;">
+    <div class="logo-mark">S</div>
+    <div>
+      <div class="logo-word">SINAMATIC<span>S</span></div>
+      <span class="logo-sub">Music Studio · Toronto</span>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#" onclick="goTo(1);return false;">Work</a></li>
+    <li><a href="#" onclick="goTo(2);return false;">About</a></li>
+    <li><a href="#" onclick="goTo(3);return false;">Services</a></li>
+    <li><a href="#" onclick="goTo(4);return false;">Pricing</a></li>
+    <li><a href="#" onclick="goTo(5);return false;">Why Us</a></li>
+    <li><a href="#" onclick="goTo(7);return false;">Team</a></li>
+    <li><a href="#" onclick="goTo(9);return false;">Book</a></li>
+  </ul>
+  <button class="nav-cta" onclick="goTo(9)">Book a Session</button>
+</nav>
+
+<div id="dots">
+  <div class="dot active" onclick="goTo(0)"></div>
+  <div class="dot" onclick="goTo(1)"></div>
+  <div class="dot" onclick="goTo(2)"></div>
+  <div class="dot" onclick="goTo(3)"></div>
+  <div class="dot" onclick="goTo(4)"></div>
+  <div class="dot" onclick="goTo(5)"></div>
+  <div class="dot" onclick="goTo(6)"></div>
+  <div class="dot" onclick="goTo(7)"></div>
+  <div class="dot" onclick="goTo(8)"></div>
+  <div class="dot" onclick="goTo(9)"></div>
+  <div class="dot" onclick="goTo(10)"></div>
+</div>
+
+<div id="section-label">01 / <span>Home</span></div>
+<div id="scroll-hint">Scroll to fly through<div class="tick"></div></div>
+
+<div id="scene">
+
+  <!-- 01 HERO -->
+  <div class="panel active" id="p0">
+    <div class="live"><span class="live-dot"></span>Toronto's Creative Headquarters</div>
+    <h1 class="hero-h1">RECORD.<br>FILM.<br>PROMOTE.<br><span style="font-size:0.55em;color:rgba(255,255,255,0.5);">ALL UNDER</span><br>ONE <span class="g">ROOF.</span></h1>
+    <p class="hero-sub">From recording your first song to producing your next music video, Sinamatics gives artists everything they need to compete at the highest level.<strong>One team. One vision. One place.</strong></p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="goTo(9)">Book a Session</button>
+      <button class="btn-outline" onclick="goTo(1)">View Our Work</button>
+    </div>
+  </div>
+
+  <!-- 02 PORTFOLIO -->
+  <div class="panel" id="p1">
+    <div class="port-header">
+      <div>
+        <div class="ey">Featured Work</div>
+        <div class="big" style="font-size:clamp(36px,5.5vw,64px);">RESULTS YOU CAN SEE.<br>QUALITY YOU CAN <span class="g">HEAR.</span></div>
+      </div>
+      <div class="port-tabs">
+        <div class="ptab active" onclick="filterPort('all',this)">All</div>
+        <div class="ptab" onclick="filterPort('music',this)">Music</div>
+        <div class="ptab" onclick="filterPort('video',this)">Video</div>
+        <div class="ptab" onclick="filterPort('commercial',this)">Commercial</div>
+      </div>
+    </div>
+    <div class="port-grid" id="port-grid">
+
+      <!-- SWAVY — large featured -->
+      <div class="port-card large" data-cat="music" onclick="openLink('https://open.spotify.com/artist/6CHTgEfOTvm5flR5Cpzw0I')">
+        <div class="port-card-bg bg-artist card-art"><canvas class="mini-wave" data-color="180,0,255"></canvas></div>
+        <div class="stream-badge">7M+ Streams</div>
+        <div class="video-badge">Columbia Records</div>
+        <div class="play-btn"></div>
+        <div class="port-info">
+          <div class="port-type">Artist Development · Recording · Production</div>
+          <div class="port-title">SWAVY — Different Breed</div>
+          <div class="port-artist">Co-signed: Drake · Future · Chris Brown · Meek Mill · PARTYNEXTDOOR · Vory</div>
+        </div>
+      </div>
+
+      <!-- 021KID LION SUN -->
+      <div class="port-card" data-cat="music video" onclick="openLink('https://www.youtube.com/watch?v=l5cyUblMrFo')">
+        <div class="port-card-bg bg-video card-art"><canvas class="mini-wave" data-color="255,60,0"></canvas></div>
+        <div class="stream-badge">200K+ Streams</div>
+        <div class="video-badge">Music Video</div>
+        <div class="play-btn"></div>
+        <div class="port-info">
+          <div class="port-type">Mix · Music Video · Production</div>
+          <div class="port-title">021KID — Lion Sun</div>
+          <div class="port-artist">Persian Drill · Iran · 2026</div>
+        </div>
+      </div>
+
+      <!-- Oon Dare Mire -->
+      <div class="port-card" data-cat="music" onclick="openLink('https://open.spotify.com/search/Oon%20Dare%20Mire')">
+        <div class="port-card-bg bg-music card-art"><canvas class="mini-wave" data-color="255,180,0"></canvas></div>
+        <div class="stream-badge">Top Streaming</div>
+        <div class="play-btn"></div>
+        <div class="port-info">
+          <div class="port-type">Production · Mix & Master</div>
+          <div class="port-title">Oon Dare Mire</div>
+          <div class="port-artist">Notable Records · Sinamatics Production</div>
+        </div>
+      </div>
+
+      <!-- Nefrin -->
+      <div class="port-card" data-cat="music" onclick="openLink('https://open.spotify.com/search/Nefrin%20Sinamatics')">
+        <div class="port-card-bg bg-music card-art"><canvas class="mini-wave" data-color="255,215,0"></canvas></div>
+        <div class="play-btn"></div>
+        <div class="port-info">
+          <div class="port-type">Production · Engineering</div>
+          <div class="port-title">Nefrin</div>
+          <div class="port-artist">Notable Records</div>
+        </div>
+      </div>
+
+      <!-- Mara Bebus -->
+      <div class="port-card" data-cat="music" onclick="openLink('https://open.spotify.com/search/Mara%20Bebus')">
+        <div class="port-card-bg bg-music card-art"><canvas class="mini-wave" data-color="0,200,255"></canvas></div>
+        <div class="play-btn"></div>
+        <div class="port-info">
+          <div class="port-type">Production · Mix & Master</div>
+          <div class="port-title">Mara Bebus</div>
+          <div class="port-artist">Notable Records</div>
+        </div>
+      </div>
+
+      <!-- My Iran -->
+      <div class="port-card" data-cat="music" onclick="openLink('https://open.spotify.com/search/My%20Iran%20Sinamatics')">
+        <div class="port-card-bg bg-music card-art"><canvas class="mini-wave" data-color="0,255,120"></canvas></div>
+        <div class="stream-badge">Spotify Promo</div>
+        <div class="play-btn"></div>
+        <div class="port-info">
+          <div class="port-type">Production · Marketing</div>
+          <div class="port-title">My Iran</div>
+          <div class="port-artist">Playlist Promotion · All Platforms</div>
+        </div>
+      </div>
+
+      <!-- Rubicon -->
+      <div class="port-card large" data-cat="commercial" onclick="openLink('https://www.instagram.com/sinamatics')">
+        <div class="port-card-bg bg-commercial card-art"><canvas class="mini-wave" data-color="0,220,180"></canvas></div>
+        <div class="video-badge">Commercial</div>
+        <div class="play-btn"></div>
+        <div class="port-info">
+          <div class="port-type">Commercial Production · Campaign</div>
+          <div class="port-title">Rubicon Exotic — Brand Campaign</div>
+          <div class="port-artist">Filming · Editing · Social Media · Product Photography</div>
+        </div>
+      </div>
+
+      <!-- Honda -->
+      <div class="port-card" data-cat="commercial" onclick="openLink('https://www.instagram.com/sinamatics')">
+        <div class="port-card-bg bg-commercial card-art"><canvas class="mini-wave" data-color="150,200,255"></canvas></div>
+        <div class="video-badge">Commercial</div>
+        <div class="play-btn"></div>
+        <div class="port-info">
+          <div class="port-type">Commercial · Campaign</div>
+          <div class="port-title">Honda Dealership</div>
+          <div class="port-artist">Full Campaign Production · BTS · Promo</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Stats row -->
+    <div class="port-stats">
+      <div class="pstat"><div><div class="pstat-num">5M+</div><div class="pstat-lbl">Total Streams</div></div></div>
+      <div class="pstat"><div><div class="pstat-num">Top 20</div><div class="pstat-lbl">Producers Under 30</div></div></div>
+      <div class="pstat"><div><div class="pstat-num">OVO</div><div class="pstat-lbl">Background</div></div></div>
+      <div class="pstat"><div><div class="pstat-num">2</div><div class="pstat-lbl">Commercial Brands</div></div></div>
+      <div class="pstat"><div><div class="pstat-num">7+</div><div class="pstat-lbl">Services</div></div></div>
+    </div>
+  </div>
+
+  <!-- 03 ABOUT -->
+  <div class="panel" id="p2">
+    <div class="ey">About Sinamatics</div>
+    <div class="big">BUILT ON<br>RESULTS.</div>
+    <div class="two" style="margin-top:20px;">
+      <div class="body">
+        Sinamatics was built with one mission: help artists and brands create world-class content without needing five different companies to get the job done.<br><br>
+        Founded by Sina Aliakbari — OVO background, 5M+ streams, dubbed the Saudi Savant, ranked in Canada's top 20 producers under 30 in 2024 — the studio combines music production, recording, filming, editing, marketing, and content creation under one roof.<br><br>
+        From independent artists like Swavy (Columbia Records, co-signed by Drake & Chris Brown) to commercial campaigns for Rubicon Exotic and Honda, every project gets the same cinematic treatment.
+        <div class="stat-grid">
+          <div class="sbox"><div class="snum">5M+</div><div class="slbl">Streams</div></div>
+          <div class="sbox"><div class="snum">Top 20</div><div class="slbl">Producers Under 30</div></div>
+          <div class="sbox"><div class="snum">OVO</div><div class="slbl">Background</div></div>
+          <div class="sbox"><div class="snum">1 Roof</div><div class="slbl">Everything Under It</div></div>
+        </div>
+      </div>
+      <div class="split-right body">
+        <div class="ey" style="margin-bottom:10px;">Our mission</div>
+        We don't just record songs. We help build careers.<br><br>
+        From that melody stuck in your head to a full release across every platform simultaneously — we handle every layer of your sonic and visual identity.<br><br>
+        We work with Rubicon, Persian TV, Honda, and clothing brands. Whether you're an independent artist or a brand, the process is the same: concept, create, release, grow.
+        <div class="gold-rule"></div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:rgba(255,255,255,0.12);letter-spacing:0.05em;line-height:1.5;">ASAP MOB · ODD FUTURE · BTS · TAYLOR GANG — the greats grew with a team. We're yours.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 SERVICES -->
+  <div class="panel" id="p3">
+    <div class="ey">Gold Standard Service</div>
+    <div class="big">EVERY SERVICE<br>YOUR SOUND <span class="g">NEEDS</span></div>
+    <div class="svc-grid">
+      <div class="svc"><div class="svc-n">01</div><div class="svc-name">Recording</div><div class="svc-desc">Acoustically treated live room. Master engineer Sina on every session. $100/hr · 2hr $180 · 6hr $510.</div></div>
+      <div class="svc"><div class="svc-n">02</div><div class="svc-name">Music Production</div><div class="svc-desc">Custom beats, co-production, arrangement. Exclusive beat library access for all members. New uploads weekly.</div></div>
+      <div class="svc"><div class="svc-n">03</div><div class="svc-name">Mixing & Mastering</div><div class="svc-desc">Radio-ready sound. Delivered for Spotify, Apple Music, YouTube, TikTok and every major platform.</div></div>
+      <div class="svc"><div class="svc-n">04</div><div class="svc-name">Music Videos</div><div class="svc-desc">3 videographers on staff. Green screens, rounded white wall, movie-quality cameras. $100/hr flat rate.</div></div>
+      <div class="svc"><div class="svc-n">05</div><div class="svc-name">Reels & Content</div><div class="svc-desc">Social media reels, AI-enhanced edits, script writing. Built for the algorithm and your audience.</div></div>
+      <div class="svc"><div class="svc-n">06</div><div class="svc-name">Marketing & Development</div><div class="svc-desc">Goal setting, brand building, playlist promo, sponsor connections. Artist development from day one.</div></div>
+    </div>
+  </div>
+
+  <!-- 05 PRICING -->
+  <div class="panel" id="p4">
+    <div class="ey">Service Packages</div>
+    <div class="big">MOVE LIKE<br>THE <span class="g">PROS</span></div>
+    <div class="pricing-grid">
+      <div class="plan">
+        <div class="plan-name">Artist Package</div>
+        <div class="plan-price">$250</div>
+        <div class="plan-per">one time</div>
+        <ul class="plan-feat">
+          <li><strong>2 hrs</strong> studio time with engineer</li>
+          <li>Recording, beat making, writing, mixing & mastering</li>
+          <li><strong>1 social media reel</strong></li>
+          <li>Song release</li>
+          <li>Snacks & water every session</li>
+        </ul>
+        <button class="plan-cta" onclick="goTo(9)">Get Started</button>
+      </div>
+      <div class="plan">
+        <div class="plan-name">Membership</div>
+        <div class="plan-price">$500</div>
+        <div class="plan-per">per month</div>
+        <ul class="plan-feat">
+          <li><strong>6 hrs</strong> studio time with engineer</li>
+          <li>Recording, beat making, goal setting, writing, mixing & mastering</li>
+          <li><strong>1 music video</strong> or 3 reels/month</li>
+          <li>Exclusive beat library access</li>
+          <li>Song release + artist promo + collabs</li>
+          <li>Snacks & water · Add-on time $40/hr</li>
+        </ul>
+        <button class="plan-cta" onclick="goTo(9)">Join Now</button>
+      </div>
+      <div class="plan featured">
+        <div class="plan-badge">Recommended</div>
+        <div class="plan-name">Platinum</div>
+        <div class="plan-price">$1,100</div>
+        <div class="plan-per">per month · best value</div>
+        <ul class="plan-feat">
+          <li><strong>9 hrs</strong> studio time with engineer</li>
+          <li>Recording, beat making, goal setting, writing, mixing & mastering</li>
+          <li><strong>1 music video</strong> + 3 reels/month</li>
+          <li>1 hr filming + 1 hr video editing</li>
+          <li>Script writing + cover art design</li>
+          <li>Beat library access</li>
+          <li>Release on ALL platforms simultaneously</li>
+          <li>Artist promo + playlist promo + collabs</li>
+          <li>Monthly goal setting & coaching</li>
+          <li>Album or song release party</li>
+          <li>Snacks & water every session</li>
+        </ul>
+        <button class="plan-cta" onclick="goTo(9)">Go Platinum</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 06 WHY US -->
+  <div class="panel" id="p5">
+    <div class="ey">Why Artists Choose Sinamatics</div>
+    <div class="big">EVERYTHING<br>IN ONE <span class="g">PLACE.</span></div>
+    <div class="why-grid">
+      <div class="check-list">
+        <div class="check-item"><strong>Recording Studio</strong></div>
+        <div class="check-item"><strong>Music Production</strong></div>
+        <div class="check-item"><strong>Mixing & Mastering</strong></div>
+        <div class="check-item"><strong>Music Videos</strong></div>
+        <div class="check-item"><strong>Reels & Social Content</strong></div>
+        <div class="check-item"><strong>Marketing Strategy</strong></div>
+        <div class="check-item"><strong>Artist Development</strong></div>
+        <div class="check-item"><strong>Cover Art Design</strong></div>
+        <div class="check-item"><strong>Release Planning</strong></div>
+        <div class="check-item"><strong>Playlist Promotion</strong></div>
+      </div>
+      <div class="why-right">
+        <div class="body" style="margin-bottom:18px;">A single song elsewhere costs <span style="color:var(--red);font-weight:700;">$1,250+</span>. Our Platinum membership covers all of that — every single month.</div>
+        <div class="value-compare">
+          <div class="vc-title">Average single song — elsewhere</div>
+          <div class="vc-row"><span>7 hrs recording @ $80/hr</span><span class="vc-red">$560</span></div>
+          <div class="vc-row"><span>2 hrs mix & master @ $100/hr</span><span class="vc-red">$200</span></div>
+          <div class="vc-row"><span>2 hrs filming @ $100/hr</span><span class="vc-red">$200</span></div>
+          <div class="vc-row"><span>Video editing & reels</span><span class="vc-red">$100</span></div>
+          <div class="vc-row"><span>Promo</span><span class="vc-red">$200</span></div>
+          <div class="vc-total-row"><span class="vc-total-lbl">Total per song</span><span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--red);">$1,250</span></div>
+          <div class="vc-title" style="border-top:0.5px solid rgba(255,255,255,0.07);">Sinamatics Platinum — all of that + more</div>
+          <div class="vc-total-row"><span class="vc-total-lbl">Monthly membership</span><span style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);">$1,100/mo</span></div>
+        </div>
+        <button class="btn-primary" style="margin-top:14px;width:100%;text-align:center;" onclick="goTo(9)">Join Platinum Today</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 TESTIMONIALS -->
+  <div class="panel" id="p6">
+    <div class="ey">What Our Clients Say</div>
+    <div class="big">REAL ARTISTS.<br>REAL <span class="g">RESULTS.</span></div>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <div class="testi-quote">"The mix came back radio-ready and exceeded every expectation. I didn't have to go anywhere else."</div>
+        <div class="testi-author">— Recording Client</div>
+      </div>
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <div class="testi-quote">"The video looked like something from a major label. The team understood exactly what I wanted to say."</div>
+        <div class="testi-author">— Music Video Client</div>
+      </div>
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <div class="testi-quote">"Best studio experience I've had in Toronto. The energy in the room makes you want to create."</div>
+        <div class="testi-author">— Artist</div>
+      </div>
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <div class="testi-quote">"They helped me turn a rough idea into a complete release — music, video, reels, everything. In one month."</div>
+        <div class="testi-author">— Independent Artist</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 TEAM -->
+  <div class="panel" id="p7">
+    <div class="ey">The Team</div>
+    <div class="big">THE PEOPLE<br>BEHIND YOUR <span class="g">SOUND</span></div>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-init">S</div>
+        <div class="team-name">Sina Aliakbari</div>
+        <div class="team-role">Founder · Head Producer · Engineer · CEO</div>
+        <div class="team-bio">OVO background. 5M+ streams. Canada's Top 20 Producers Under 30, 2024. Dubbed the Saudi Savant. Credits include Swavy (Columbia Records), 021KID, Rubicon, Honda, and more. From classical to hard trap, dubstep to lo-fi — your session is in the best hands in Toronto.</div>
+      </div>
+      <div class="team-card">
+        <div class="team-init">H</div>
+        <div class="team-name">Heidi</div>
+        <div class="team-role">Filming · Editing · Video Director · Script Writing</div>
+        <div class="team-bio">Full video direction from concept to final cut. Movie-quality production with green screens, rounded white wall, cinematic lighting. Credits include music videos, commercial campaigns for Rubicon and Honda, and social content rollouts.</div>
+      </div>
+      <div class="team-card">
+        <div class="team-init">J</div>
+        <div class="team-name">Josh</div>
+        <div class="team-role">Writer · Creative</div>
+        <div class="team-bio">The creative voice behind the sessions. Josh brings the storytelling, lyrics, and strategic thinking that helps artists find their voice and communicate their vision to the world.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 09 CTA -->
+  <div class="panel" id="p8">
+    <div class="cta-big">STOP WAITING FOR<br>THE PERFECT MOMENT.<br><span style="color:var(--gold);">START BUILDING</span><br>SOMETHING REAL.</div>
+    <p class="body" style="max-width:420px;margin:0 auto 26px;text-align:center;">Most artists spend years planning. The ones who succeed start creating. Book your session today.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-primary" onclick="goTo(9)" style="font-size:12px;padding:15px 36px;">Book Now</button>
+      <button class="btn-outline" onclick="goTo(4)" style="font-size:12px;padding:15px 36px;">View Pricing</button>
+    </div>
+    <div style="margin-top:28px;display:flex;justify-content:center;gap:36px;flex-wrap:wrap;">
+      <div style="text-align:center;"><div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--gold);">5M+</div><div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.26);">Streams</div></div>
+      <div style="text-align:center;"><div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--gold);">Top 20</div><div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.26);">Producers Under 30</div></div>
+      <div style="text-align:center;"><div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--gold);">7 Days</div><div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.26);">A Week</div></div>
+      <div style="text-align:center;"><div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--gold);">24 Hrs</div><div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.26);">Response Time</div></div>
+    </div>
+  </div>
+
+  <!-- 10 BOOK -->
+  <div class="panel" id="p9">
+    <div class="book-grid">
+      <div>
+        <div class="ey">Start Your Next Project</div>
+        <div class="big">LET'S MAKE<br>SOMETHING <span class="g">REAL</span></div>
+        <p class="body" style="margin-top:14px;">Whether you're recording a single, filming a music video, launching a brand campaign, or building a long-term artist strategy, we're ready to help.</p>
+        <div class="book-note" style="margin-top:18px;">
+          Every inquiry answered within 24 hours.<br>
+          Available 7 days a week.<br><br>
+          <strong style="color:rgba(255,255,255,0.55);">Recording:</strong> $100/hr · 2hr $180 · 6hr $510<br>
+          <strong style="color:rgba(255,255,255,0.55);">Filming:</strong> $100/hr · Full day $1,400<br>
+          <strong style="color:rgba(255,255,255,0.55);">Beat Library:</strong> Free for members · $50/mo non-members<br>
+          <strong style="color:rgba(255,255,255,0.55);">Rush orders</strong> on mixtapes, albums & videos available.
+        </div>
+      </div>
+      <div class="bform">
+        <div class="frow">
+          <div class="fg"><label>Artist name</label><input type="text" placeholder="Your name or alias"/></div>
+          <div class="fg"><label>Email</label><input type="email" placeholder="your@email.com"/></div>
+        </div>
+        <div class="fg">
+          <label>What you need</label>
+          <select>
+            <option value="" disabled selected>Select a package or service</option>
+            <option>Artist Package — $250</option>
+            <option>Membership — $500/mo</option>
+            <option>Platinum Membership — $1,100/mo (Recommended)</option>
+            <option>Recording only — $100/hr</option>
+            <option>Filming only — $100/hr</option>
+            <option>Mix & Master</option>
+            <option>Music Video</option>
+            <option>Beat Library — $50/mo</option>
+            <option>Commercial / Brand Campaign</option>
+            <option>Rush Order</option>
+          </select>
+        </div>
+        <div class="frow">
+          <div class="fg"><label>Preferred date</label><input type="date"/></div>
+          <div class="fg"><label>Session length</label>
+            <select>
+              <option value="" disabled selected>Duration</option>
+              <option>1–2 hours</option>
+              <option>Half day (4 hrs)</option>
+              <option>Full day (8 hrs)</option>
+              <option>Multi-day / ongoing</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg"><label>Tell us about your project</label><textarea placeholder="Genre, vibe, references, where you're at in the process..."></textarea></div>
+        <button class="btn-g" onclick="handleBook()">Send Request</button>
+        <div id="form-ok">Done. We'll hit you back within 24 hours.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11 CONTACT -->
+  <div class="panel" id="p10">
+    <div class="ey" style="justify-content:center;">Let's Create Something Different</div>
+    <div class="c-big">
+      READY WHEN<br>YOU <span style="color:var(--red);">ARE</span><br>
+      <a href="mailto:sinamatics1996@gmail.com">sinamatics1996@gmail.com</a>
+    </div>
+    <div class="c-socials">
+      <a class="csoc" href="https://www.instagram.com/sinamatics" target="_blank">@sinamatics</a>
+      <a class="csoc" href="https://www.tiktok.com/@sinamatics" target="_blank">TikTok</a>
+      <a class="csoc" href="https://www.youtube.com/@sinamatics" target="_blank">YouTube</a>
+      <a class="csoc" href="https://www.facebook.com/sinamatics" target="_blank">Facebook</a>
+    </div>
+    <div class="c-info">10 Patricia Ave, Toronto, Ontario<br>By Appointment Only · 7 Days a Week</div>
+    <div class="c-cr">© 2024 Sinamatics Music Studio · All rights reserved · sinamatics1996@gmail.com</div>
+  </div>
+
+</div>
+
+<script>
+/* ── WAVEFORM BG ── */
+const wc=document.getElementById('waveform');
+const wctx=wc.getContext('2d');
+let W,H;
+function rz(){W=wc.width=window.innerWidth;H=wc.height=window.innerHeight;}
+rz();window.addEventListener('resize',rz);
+const BARS=72;
+const bars=Array.from({length:BARS},(_,i)=>({
+  base:0.12+0.88*Math.pow(Math.sin((i/BARS)*Math.PI),0.65),
+  spd:0.5+Math.random()*1.6,ph:i*0.21+Math.random()*2,
+  ph2:Math.random()*Math.PI*2,kph:Math.random()*Math.PI*2
+}));
+let wt=0,beatT=0,beatI=0;
+const bInt=60/88;
+function drawWave(){
+  wctx.clearRect(0,0,W,H);wctx.fillStyle='#020208';wctx.fillRect(0,0,W,H);
+  const bw=W/BARS,maxH=H*0.68;
+  beatT+=0.016;
+  const bc=(beatT%bInt)/bInt;
+  const bk=Math.max(0,1-bc*3.5)*(bc<0.28?1:0);
+  beatI+=(bk-beatI)*0.15;
+  for(let i=0;i<BARS;i++){
+    const b=bars[i],pos=i/BARS;
+    const w1=Math.sin(wt*b.spd+b.ph);
+    const w2=Math.sin(wt*b.spd*0.5+b.ph2)*0.45;
+    const w3=Math.sin(wt*0.28+pos*Math.PI*3)*0.28;
+    const kick=Math.sin(wt*4+b.kph)*beatI*0.55;
+    const raw=(w1+w2+w3+kick)/2.28;
+    const norm=Math.max(0.03,(raw+1)*0.5);
+    const barH=b.base*norm*maxH;
+    const x=i*bw,y=(H-barH)/2;
+    const dist=Math.abs(pos-0.5)*2;
+    const bf=norm*(1-dist*0.45);
+    const alpha=(0.18+0.22*bf+beatI*0.1)*0.62;
+    const g2=dist<0.4?Math.floor(160+95*(1-dist/0.4)):Math.floor(160*(1-(dist-0.4)/0.6));
+    wctx.fillStyle=`rgba(255,${g2},0,${Math.min(0.52,alpha)})`;
+    wctx.fillRect(x+1,y,bw-2,barH);
+    wctx.fillStyle=`rgba(255,240,100,${Math.min(0.28,alpha*1.1)})`;
+    wctx.fillRect(x+1,y,bw-2,Math.max(1.5,barH*0.03));
+  }
+  wctx.fillStyle='rgba(255,215,0,0.04)';wctx.fillRect(0,H/2-0.5,W,1);
+  wt+=0.016;requestAnimationFrame(drawWave);
+}
+drawWave();
+
+/* ── MINI WAVEFORMS IN PORTFOLIO CARDS ── */
+function initMiniWaves(){
+  document.querySelectorAll('.mini-wave').forEach(c=>{
+    const raw = c.dataset.color||'255,215,0';
+    const [r,g,b]=raw.split(',').map(Number);
+    const ctx=c.getContext('2d');
+    const bars2=Array.from({length:32},(_,i)=>({
+      base:0.1+0.9*Math.pow(Math.sin((i/32)*Math.PI),0.5),
+      spd:0.4+Math.random()*1.2,ph:i*0.35+Math.random()*2,
+      ph2:Math.random()*Math.PI*2
+    }));
+    let t2=0;
+    function draw2(){
+      if(!c.parentElement){return;}
+      c.width=c.offsetWidth||200;c.height=c.offsetHeight||160;
+      const cw=c.width,ch=c.height;
+      ctx.clearRect(0,0,cw,ch);
+      const bw2=cw/32,mh=ch*0.7;
+      for(let i=0;i<32;i++){
+        const b2=bars2[i];
+        const w1=Math.sin(t2*b2.spd+b2.ph);
+        const w2=Math.sin(t2*b2.spd*0.5+b2.ph2)*0.4;
+        const raw2=(w1+w2)/1.4;
+        const norm2=Math.max(0.05,(raw2+1)*0.5);
+        const bh=b2.base*norm2*mh;
+        const x2=i*bw2,y2=(ch-bh)/2;
+        ctx.fillStyle=`rgba(${r},${g},${b},${0.18+0.22*norm2})`;
+        ctx.fillRect(x2+0.5,y2,bw2-1,bh);
+      }
+      t2+=0.018;requestAnimationFrame(draw2);
+    }
+    setTimeout(draw2,100);
+  });
+}
+window.addEventListener('load',initMiniWaves);
+setTimeout(initMiniWaves,300);
+
+/* ── PORTFOLIO FILTER ── */
+function filterPort(cat,btn){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.port-card').forEach(card=>{
+    const c=card.dataset.cat||'';
+    const show=(cat==='all'||c.includes(cat));
+    card.style.display=show?'flex':'none';
+  });
+}
+
+/* ── NAVIGATION ── */
+const panels=document.querySelectorAll('.panel');
+const dots=document.querySelectorAll('.dot');
+const names=['Home','Work','About','Services','Pricing','Why Us','Testimonials','Team','Start Now','Book','Contact'];
+const nums=['01','02','03','04','05','06','07','08','09','10','11'];
+const lbl=document.getElementById('section-label');
+const hint=document.getElementById('scroll-hint');
+const ov=document.getElementById('overlay');
+let cur=0,anim=false;
+function goTo(idx){
+  if(idx===cur||anim||idx<0||idx>=panels.length)return;
+  anim=true;
+  ov.classList.add('flash');
+  setTimeout(()=>ov.classList.remove('flash'),220);
+  const dir=idx>cur?1:-1;
+  panels[cur].style.transition='opacity 0.26s ease,transform 0.3s ease';
+  panels[cur].style.opacity='0';
+  panels[cur].style.transform=`translate(-50%,-50%) translateY(${dir*-34}px)`;
+  setTimeout(()=>{
+    panels[cur].classList.remove('active');
+    panels[cur].style.transition='none';
+    panels[cur].style.transform='translate(-50%,-50%)';
+    cur=idx;
+    panels[cur].classList.add('active');
+    panels[cur].style.opacity='0';
+    panels[cur].style.transform=`translate(-50%,-50%) translateY(${dir*34}px)`;
+    panels[cur].style.transition='opacity 0.4s ease,transform 0.4s ease';
+    requestAnimationFrame(()=>{
+      panels[cur].style.opacity='1';
+      panels[cur].style.transform='translate(-50%,-50%) translateY(0px)';
+    });
+    dots.forEach((d,i)=>d.classList.toggle('active',i===cur));
+    lbl.innerHTML=`${nums[cur]} / <span>${names[cur]}</span>`;
+    hint.style.opacity=cur===0?'1':'0';
+    setTimeout(()=>{anim=false;},440);
+  },290);
+}
+let wa=0,wt2=null;
+window.addEventListener('wheel',e=>{
+  e.preventDefault();wa+=e.deltaY;
+  clearTimeout(wt2);
+  wt2=setTimeout(()=>{if(wa>25)goTo(cur+1);else if(wa<-25)goTo(cur-1);wa=0;},70);
+},{passive:false});
+let ty=0;
+window.addEventListener('touchstart',e=>{ty=e.touches[0].clientY;},{passive:true});
+window.addEventListener('touchend',e=>{
+  const dy=ty-e.changedTouches[0].clientY;
+  if(dy>35)goTo(cur+1);else if(dy<-35)goTo(cur-1);
+},{passive:true});
+window.addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'||e.key==='ArrowRight')goTo(cur+1);
+  if(e.key==='ArrowUp'||e.key==='ArrowLeft')goTo(cur-1);
+});
+function openLink(url){window.open(url,'_blank');}
+function handleBook(){
+  const el=document.getElementById('form-ok');el.style.display='block';
+  setTimeout(()=>{el.style.display='none';},5000);
+}
+</script>
+</body>
+</html>
